@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="flex bg-red-100">
+    <div class="w-1/5 h-screen bg-gray-800 p-5">
+        <h2 class="text-white text-lg font-semibold mb-4">Admn [{{ username }}]</h2>
+        <ul class="space-y-2">
+            <li><a href="{{ url_for('x') }}" class="text-gray-300 hover:text-white flex items-center"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a></li>
+            <li>
+                <a href="{{ url_for('view_cards') }}" class="text-gray-300 hover:text-white flex items-center">
+                    <i class="fas fa-credit-card mr-2"></i> View Cards
+                </a><li><a href="{{ url_for('manage_cards') }}" class="text-gray-300 hover:text-white flex items-center"><i class="fas fa-users mr-2"></i> manage_cards</a></li>
+            <li><a href="{{ url_for('transactions') }}" class="text-gray-300 hover:text-white flex items-center"><i class="fas fa-file-upload mr-2"></i> Transaction</a></li>
+            <li><a href="{{ url_for('logout') }}" class="text-gray-300 hover:text-white flex items-center"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a></li>
+        </ul>
+    </div>
+    <div class="flex-grow p-5">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+        <h1 class="text-2xl font-bold text-center mb-4">Card Prediction</h1>
+
+        <form id="cardForm">
+            <div class="mb-4">
+                <label for="card_number" class="block text-sm font-medium text-gray-700">Card Number</label>
+                <input type="text" id="card_number" name="card_number" class="mt-2 p-2 w-full border border-gray-300 rounded-md" required />
+            </div>
+
+            <div class="mb-4">
+                <button type="submit" class="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                    Predict Cost
+                </button>
+            </div>
+        </form>
+
+        <div id="result" class="mt-4 hidden bg-gray-200">
+            <h2 class="font-semibold text-xl text-center">Prediction Result</h2>
+               <div class="text-center text-lg text-gray-700">
+                <p><strong>Card Number:</strong> <span id="cardNumberText"></span></p>
+                <p><strong>Cardholder Name:</strong> <span id="cardholderNameText"></span></p>
+                  <p><strong>Current Balance:</strong>  <span id="balanceText"> </span> FRCS</p>
+                <div class="text-center text-lg text-gray-700 bg-gray-800">   
+              
+                <!-- <p><strong>Total Monthly Transactions:</strong> FRCS<span id="totalMonthlyTransactionsText"></span></p> -->
+                <p class="text-center text-lg text-blue-700"><strong>Next Month Predicted:</strong> <b><span id="predictionText"></span></b> </span>FRCS</p>
+            </div>
+        </div>
+        </div>
+
+        <div id="error" class="mt-4 hidden">
+            <h2 class="font-semibold text-xl text-center">Error</h2>
+            <p id="errorMessage" class="text-center text-lg text-red-500"></p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('cardForm');
+        const resultSection = document.getElementById('result');
+        const predictionText = document.getElementById('predictionText');
+        const cardNumberText = document.getElementById('cardNumberText');
+        const cardholderNameText = document.getElementById('cardholderNameText');
+        // const expiryDateText = document.getElementById('expiryDateText');
+        // const cvvText = document.getElementById('cvvText');
+        const balanceText = document.getElementById('balanceText');
+        // const totalMonthlyTransactionsText = document.getElementById('totalMonthlyTransactionsText');
+        const errorSection = document.getElementById('error');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const cardNumber = document.getElementById('card_number').value;
+
+            // Clear previous results
+            resultSection.classList.add('hidden');
+            errorSection.classList.add('hidden');
+
+            if (!cardNumber) {
+                errorSection.classList.remove('hidden');
+                errorMessage.textContent = 'Card number is required.';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://172.25.31.124:5000/card-and-predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ card_number: cardNumber }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultSection.classList.remove('hidden');
+                    // Populate result section with data
+                    cardNumberText.textContent = data.card_number;
+                    cardholderNameText.textContent = data.cardholder_name;
+                    // expiryDateText.textContent = data.expiry_date;
+                    // cvvText.textContent = data.cvv;
+                    balanceText.textContent = data.balance.toFixed(2);
+                    // totalMonthlyTransactionsText.textContent = data.total_monthly_transactions.toFixed(2);
+                    predictionText.textContent = data.predicted_cost.toFixed(2);
+                } else {
+                    errorSection.classList.remove('hidden');
+                    errorMessage.textContent = data.error || 'An unknown error occurred';
+                }
+            } catch (error) {
+                errorSection.classList.remove('hidden');
+                errorMessage.textContent = 'Failed to fetch data from the server.';
+            }
+        });
+    </script>
+
+</body>
+</html>

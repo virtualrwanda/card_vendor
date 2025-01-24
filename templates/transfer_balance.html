@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+</head>
+<body class="flex bg-gray-100 text-gray-800">
+    <!-- Side Navigation Bar -->
+    <div class="w-64 h-screen bg-gray-900 text-white p-5 hidden sm:block">
+        <h2 class="text-lg font-semibold mb-4"> {{ username }}</h2>
+        <ul class="space-y-4">
+            <ul class="space-y-2">
+                <li><a href="{{ url_for('manage_cards') }}" class="text-gray-300 hover:text-white flex items-center"><i class="fas fa-home mr-2"></i> manage_cards</a></li>
+                <li><a href="{{ url_for('transactions') }}" class="text-gray-300 hover:text-white flex items-center"><i class="fas fa-users mr-2"></i> Transactions</a></li>
+
+                <li><a href="{{ url_for('logout') }}" class="text-gray-300 hover:text-white flex items-center"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a></li>
+            </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-grow p-6"><!-- transfer_balance.html -->
+
+  <h2>Transfer Balance</h2>
+  <!-- Transfer Balance Form -->
+  <form method="POST" class="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
+    {{ form.hidden_tag() }}
+    
+    <!-- Sender Card Number -->
+    <div class="mb-4">
+        {{ form.sender_card_number.label(class="block text-gray-600 font-medium mb-2") }}
+        {{ form.sender_card_number(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+    </div>
+    
+    <!-- Receiver Card Number -->
+    <div class="mb-4">
+        {{ form.receiver_card_number.label(class="block text-gray-600 font-medium mb-2") }}
+        {{ form.receiver_card_number(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+    </div>
+    
+    <!-- Amount -->
+    <div class="mb-4">
+        {{ form.amount.label(class="block text-gray-600 font-medium mb-2") }}
+        {{ form.amount(class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline") }}
+    </div>
+    
+    <!-- Submit Button -->
+    <div class="flex justify-end">
+        {{ form.submit(class="bg-blue-500 text-white font-medium py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2") }}
+    </div>
+</form>
+
+</div>
+<!-- Transfer Records Table -->
+<!-- Add this table inside the 'transfer_balance.html' template -->
+
+<div class="overflow-auto bg-white rounded-lg shadow-md">
+  <h3 class="y-64 text-xl font-semibold text-gray-700 mb-2">Transfer Records</h3>  
+  <table class="min-w-full bg-white">
+        <thead>
+            <tr class="w-full bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <th class="py-3 px-6 text-left">Sender Card</th>
+                <th class="py-3 px-6 text-left">Receiver Card</th>
+                <th class="py-3 px-6 text-center">Amount</th>
+                <th class="py-3 px-6 text-center">Date</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-700 text-sm font-light">
+            {% for transfer in transfers %}
+                <tr class="border-b border-gray-200 hover:bg-gray-100">
+                    <td class="py-3 px-6 text-left">{{ transfer.sender_card_number }}</td>
+                    <td class="py-3 px-6 text-left">{{ transfer.receiver_card_number }}</td>
+                    <td class="py-3 px-6 text-center">{{ transfer.amount }}</td>
+                    <td class="py-3 px-6 text-center">{{ transfer.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="text-center py-3 text-gray-500">No transfers made yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+    
+</div>
+</body>
+</html>
